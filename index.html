@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>All In 🌏ne Bot Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #2c2f33;
+    color: #fff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body.light-theme {
+    background-color: #f5f5f5;
+    color: #222222;
+  }
+  header {
+    background-color: #23272a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    border-bottom: 3px solid #7289da;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body.light-theme header {
+    background-color: #ddd;
+    border-color: #87aaff;
+    color: #222222;
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.8rem;
+    color: #7289da;
+  }
+  body.light-theme header h1 {
+    color: #4666cc;
+  }
+  nav a {
+    color: #99aab5;
+    margin-left: 1.5rem;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  nav a:hover {
+    color: #ffffff;
+  }
+  body.light-theme nav a {
+    color: #666;
+  }
+  body.light-theme nav a:hover {
+    color: #222222;
+  }
+  main.container {
+    max-width: 900px;
+    margin: 2rem auto 3rem;
+    padding: 0 1rem;
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+  }
+  .card {
+    background-color: #23272a;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 0 20px #7289da70;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.6s ease, opacity 0.6s ease;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  .card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  body.light-theme .card {
+    background-color: #fff;
+    color: #222;
+    box-shadow: 0 0 20px #87aaff80;
+  }
+  .card h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: #ffffff;
+    border-bottom: 2px solid #7289da;
+    padding-bottom: 0.2rem;
+  }
+  body.light-theme .card h2 {
+    color: #4666cc;
+    border-color: #87aaff;
+  }
+  .status {
+    font-weight: 700;
+    font-size: 1.5rem;
+    user-select: none;
+  }
+  .status.online {
+    color: #43b581;
+  }
+  .status.offline {
+    color: #f04747;
+  }
+  body.light-theme .status.online {
+    color: #2e7d32;
+  }
+  body.light-theme .status.offline {
+    color: #c62828;
+  }
+  #logArea {
+    background-color: #2c2f33;
+    color: #dcddde;
+    height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 1rem;
+    white-space: pre-wrap;
+    user-select: text;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body.light-theme #logArea {
+    background-color: #f0f0f0;
+    color: #222;
+  }
+  footer {
+    text-align: center;
+    padding: 1rem 0;
+    color: #72767d;
+    font-size: 0.9rem;
+    border-top: 1px solid #202225;
+    background-color: #23272a;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body.light-theme footer {
+    background-color: #ddd;
+    border-color: #87aaff;
+    color: #555;
+  }
+  .user-info {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .user-info img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-right: 1rem;
+  }
+  .btn {
+    cursor: pointer;
+    background-color: #7289da;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin-left: auto;
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  .btn:hover:not(:disabled) {
+    background-color: #5b6eae;
+  }
+  body.light-theme .btn {
+    background-color: #4666cc;
+    color: #eee;
+  }
+  body.light-theme .btn:hover:not(:disabled) {
+    background-color: #3152a0;
+  }
+  #notification {
+    margin-top: 0.5rem;
+    font-weight: 600;
+    color: #f39c12;
+  }
+  @media(max-width: 480px) {
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    nav a {
+      margin-left: 0;
+      margin-top: 0.7rem;
+    }
+    main.container {
+      grid-template-columns: 1fr;
+    }
+    .btn {
+      margin-left: 0;
+      margin-top: 0.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>All In 🌏ne Bot Dashboard</h1>
+  <nav>
+    <a href="#status">Status</a>
+    <a href="#events">Events</a>
+    <a href="https://discord.com/oauth2/authorize?client_id=1373687706894204948" target="_blank" rel="noopener noreferrer">Click here to invite bot</a>
+  </nav>
+</header>
+
+<main class="container" role="main">
+    <section id="status" class="card" aria-label="Bot connection status">
+      <h2>Bot Status</h2>
+      <div>
+        Status: <span id="botStatus" class="status online" aria-live="polite">Online</span>
+      </div>
+      <div style="margin-top: 1rem; line-height: 1.4;">
+        <div><strong>Bot Name:</strong> <span id="botNameDisplay">All In 🌏ne</span></div>
+        <div><strong>Version:</strong> <span id="botVersion">1.0.0</span></div>
+        <div><strong>Uptime:</strong> <span id="botUptime">11 days ago</span></div>
+        <div><strong>Serving:</strong> <span id="serverCount">Counting</span> servers with <span id="userCount">Counting</span> users.</div>
+      </div>
+    </section>
+
+    <section id="events" class="card" aria-label="Bot events and logs">
+      <h2>Events & Logs</h2>
+      <div id="logArea" tabindex="0" role="log" aria-live="polite" aria-atomic="false">No events yet.</div>
+    </section>
+
+    <section class="user-info" aria-label="Current user information">
+      <img id="userAvatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User avatar" />
+      <div>
+        <strong id="userName"></strong>
+        <div id="notification"></div>
+      </div>
+      <button id="logoutButton" class="btn" aria-label="Logout">Logout</button>
+      <button id="themeToggleButton" class="btn" aria-label="Toggle light or dark theme">Switch to Light Theme</button>
+    </section>
+</main>
+
+<footer>
+  &copy; 2025 All In 🌏ne Bot Dashboard
+</footer>
+
+<script>
+  (() => {
+    // Elements
+    const botStatus = document.getElementById('botStatus');
+    const botNameDisplay = document.getElementById('botNameDisplay');
+    const botVersion = document.getElementById('botVersion');
+    const botUptime = document.getElementById('botUptime');
+    const logArea = document.getElementById('logArea');
+    const serverCount = document.getElementById('serverCount');
+    const userCount = document.getElementById('userCount');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+    const logoutButton = document.getElementById('logoutButton');
+    const themeToggleButton = document.getElementById('themeToggleButton');
+    const notification = document.getElementById('notification');
+
+    // Initialize user info empty (no guest account text)
+    userName.textContent = "";
+    notification.textContent = "";
+
+    // Functions
+    function log(msg) {
+      const now = new Date().toLocaleTimeString();
+      logArea.textContent += `[${now}] ${msg}\n`;
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    logoutButton.addEventListener("click", () => {
+      // No guest account, just clear user info on logout
+      userName.textContent = "";
+      userAvatar.src = "https://cdn.discordapp.com/embed/avatars/0.png";
+      notification.textContent = "You have logged out.";
+      log("User logged out.");
+    });
+
+    themeToggleButton.addEventListener("click", () => {
+      const isLight = document.body.classList.toggle("light-theme");
+      themeToggleButton.textContent = isLight ? "Switch to Dark Theme" : "Switch to Light Theme";
+    });
+
+    // Initialize UI with fixed bot info and no user info
+    function init() {
+      botNameDisplay.textContent = "All In 🌏ne";
+      botVersion.textContent = "1.0.0";
+      botStatus.classList.add("online");
+      botStatus.textContent = "Online";
+      botUptime.textContent = "11 days ago";
+      serverCount.textContent = "Counting";
+      userCount.textContent = "Counting";
+      log("Dashboard loaded.");
+    }
+
+    // Animate cards on scroll using Intersection Observer
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.1,
+    };
+
+    const observerCallback = (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    document.querySelectorAll('.card').forEach(card => {
+      observer.observe(card);
+    });
+
+    init();
+  })();
+</script>
+</body>
+</html>
+
