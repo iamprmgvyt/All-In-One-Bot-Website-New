@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>All In 🌏ne Bot Management Dashboard</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Poppins', sans-serif;
+    background-color: #2c2f33;
+    color: #fff;
+    overflow: hidden;
+  }
+  body.light-theme {
+    background-color: #f5f7fa;
+    color: #222;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* Layout */
+  #app {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+  /* Sidebar */
+  aside.sidebar {
+    width: 260px;
+    background-color: #23272a;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+    border-right: 1px solid #3a3c41;
+  }
+  body.light-theme aside.sidebar {
+    background-color: #fff;
+    border-right-color: #ccc;
+    color: #222;
+  }
+  aside.sidebar h2 {
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin: 1.5rem 1rem;
+    color: #7289da;
+  }
+  aside.sidebar nav {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  aside.sidebar nav button {
+    background: none;
+    border: none;
+    color: inherit;
+    text-align: left;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    width: 100%;
+    transition: background-color 0.3s ease;
+  }
+  aside.sidebar nav button.active,
+  aside.sidebar nav button:hover {
+    background-color: #7289da;
+    color: #fff;
+  }
+  body.light-theme aside.sidebar nav button.active,
+  body.light-theme aside.sidebar nav button:hover {
+    background-color: #4666cc;
+    color: #fff;
+  }
+  aside.sidebar footer {
+    padding: 1rem 2rem;
+    font-size: 0.85rem;
+    text-align: center;
+    border-top: 1px solid #3a3c41;
+    color: #999;
+  }
+  body.light-theme aside.sidebar footer {
+    border-top-color: #ccc;
+    color: #444;
+  }
+  /* Header */
+  header#topbar {
+    height: 59px;
+    background-color: #23272a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid #3a3c41;
+    flex-shrink: 0;
+  }
+  body.light-theme header#topbar {
+    background-color: #fff;
+    border-color: #ccc;
+    color: #222;
+  }
+  header#topbar h1 {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin: 0;
+    color: #7289da;
+  }
+  body.light-theme header#topbar h1 {
+    color: #4666cc;
+  }
+  header#topbar .user-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  header#topbar .user-area img.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  header#topbar .user-area span.username {
+    font-weight: 600;
+  }
+  header#topbar .btn-logout, #themeToggleBtn {
+    background-color: #7289da;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+  }
+  header#topbar .btn-logout:hover, #themeToggleBtn:hover {
+    background-color: #5a6ea5;
+  }
+  body.light-theme header#topbar .btn-logout, body.light-theme #themeToggleBtn {
+    background-color: #4666cc;
+    color: #eee;
+  }
+  body.light-theme header#topbar .btn-logout:hover, body.light-theme #themeToggleBtn:hover {
+    background-color: #3152a0;
+  }
+  /* Main content area */
+  main#content {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #2c2f33;
+    padding: 1.5rem;
+  }
+  body.light-theme main#content {
+    background-color: #f5f7fa;
+    color: #222;
+  }
+  main#content > section {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h2.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #7289da;
+    padding-bottom: 0.3rem;
+    color: inherit;
+  }
+  body.light-theme h2.section-title {
+    border-color: #4666cc;
+  }
+  /* Dashboard overview */
+  .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .card-small {
+    background-color: #23272a;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 0 20px #7289da70;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body.light-theme .card-small {
+    background-color: #fff;
+    color: #222;
+    box-shadow: 0 0 20px #87aaff80;
+  }
+  .card-small strong {
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .card-small .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  /* Logs */
+  #logArea {
+    height: 320px;
+    background-color: #2c2f33;
+    color: #dcddde;
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body.light-theme #logArea {
+    background-color: #eeeeee;
+    color: #222;
+  }
+  /* Commands Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #444;
+  }
+  body.light-theme th, body.light-theme td {
+    border-color: #ccc;
+  }
+  th {
+    background-color: #2e3238;
+    font-weight: 600;
+  }
+  body.light-theme th {
+    background-color: #d1d9fc;
+  }
+  tbody tr:hover {
+    background-color: #444c5d;
+  }
+  body.light-theme tbody tr:hover {
+    background-color: #a3b1f2;
+  }
+  /* Forms */
+  form {
+    max-width: 600px;
+    margin-top: 1rem;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+  input[type="text"], select, textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: #3a3c41;
+    color: #eee;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  input[type="text"]:focus, select:focus, textarea:focus {
+    outline: 2px solid #7289da;
+    background-color: #202225;
+  }
+  body.light-theme input[type="text"],
+  body.light-theme select,
+  body.light-theme textarea {
+    background-color: #fff;
+    color: #222;
+  }
+  body.light-theme input[type="text"]:focus,
+  body.light-theme select:focus,
+  body.light-theme textarea:focus {
+    background-color: #eef4fe;
+    outline-color: #4666cc;
+  }
+  button.form-submit {
+    background-color: #7289da;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  button.form-submit:hover {
+    background-color: #5a6ea5;
+  }
+  body.light-theme button.form-submit {
+    background-color: #4666cc;
+  }
+  body.light-theme button.form-submit:hover {
+    background-color: #3152a0;
+  }
+  /* Responsive */
+  @media(max-width: 768px) {
+    aside.sidebar {
+      width: 60px;
+    }
+    aside.sidebar h2 {
+      display: none;
+    }
+    aside.sidebar nav button {
+      padding: 1rem 1rem;
+      text-align: center;
+      font-size: 0;
+    }
+    aside.sidebar nav button::before {
+      content: attr(data-icon);
+      font-size: 1.5rem;
+      vertical-align: middle;
+      display: block;
+      margin: 0 auto;
+    }
+    main#content {
+      padding: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" aria-label="Sidebar navigation">
+    <h2>Menu</h2>
+    <nav role="navigation" aria-label="Main navigation">
+      <button class="nav-btn active" data-section="dashboard" data-icon="🏠" aria-current="page">Dashboard</button>
+      <button class="nav-btn" data-section="commands" data-icon="⚙️">Commands</button>
+      <button class="nav-btn" data-section="settings" data-icon="🔧">Settings</button>
+      <button class="nav-btn" data-section="logs" data-icon="📜">Logs</button>
+      <button class="nav-btn" data-section="profile" data-icon="👤">Profile</button>
+    </nav>
+    <footer>© 2025 All In 🌏ne Bot</footer>
+  </aside>
+
+  <div style="flex-grow:1; display:flex; flex-direction:column; overflow: hidden;">
+    <header id="topbar" role="banner">
+      <h1>All In 🌏ne Bot Dashboard</h1>
+      <div class="user-area" role="region" aria-label="User profile">
+        <img class="avatar" id="profileAvatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User Avatar" />
+        <span class="username" id="profileName">User#0000</span>
+        <button id="logoutBtn" aria-label="Logout" title="Logout">Logout</button>
+        <button id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle light or dark theme">Dark Mode</button>
+      </div>
+    </header>
+
+    <main id="content" tabindex="-1" role="main" aria-live="polite" aria-atomic="true">
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="content-section visible" aria-label="Dashboard overview">
+        <h2 class="section-title">Dashboard Overview</h2>
+        <div class="dashboard-cards">
+          <div class="card-small" tabindex="0" aria-label="Bot status">
+            <strong>Status</strong>
+            <div class="value" id="botStatus">Online</div>
+          </div>
+          <div class="card-small" tabindex="0" aria-label="Servers count">
+            <strong>Servers</strong>
+            <div class="value" id="serverCount">Counting</div>
+          </div>
+          <div class="card-small" tabindex="0" aria-label="Users count">
+            <strong>Users</strong>
+            <div class="value" id="userCount">Counting</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Commands Section -->
+      <section id="commands" class="content-section" aria-label="Commands management" hidden>
+        <h2 class="section-title">Commands Management</h2>
+        <p>Manage your bot's commands and prefix. Command prefix is fixed to <code>/</code>.</p>
+        <table aria-label="Commands list">
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Description</th>
+              <th>Enabled</th>
+            </tr>
+          </thead>
+          <tbody id="commandsTableBody">
+            <!-- Dynamically filled -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settings" class="content-section" aria-label="Bot settings" hidden>
+        <h2 class="section-title">Settings</h2>
+        <form id="settingsForm" aria-label="Bot settings form">
+          <label for="presenceInput">Bot Status Message</label>
+          <input id="presenceInput" type="text" placeholder="e.g. Playing with All In 🌏ne" />
+          <label for="welcomeMessageInput">Welcome Message</label>
+          <textarea id="welcomeMessageInput" rows="3" placeholder="Message sent to new users"></textarea>
+          <button type="submit" class="form-submit">Save Settings</button>
+        </form>
+        <div id="settingsStatus" aria-live="polite" style="margin-top: 1rem; font-weight: 600;"></div>
+      </section>
+
+      <!-- Logs Section -->
+      <section id="logs" class="content-section" aria-label="Event logs" hidden>
+        <h2 class="section-title">Logs & Events</h2>
+        <div id="logArea" tabindex="0" role="log" aria-live="polite" aria-atomic="false" style="height: 320px; overflow-y: auto; background-color: #2c2f33; border-radius: 8px; padding:1rem; font-family: monospace; white-space: pre-wrap; color:#ddd;"></div>
+      </section>
+
+      <!-- Profile Section -->
+      <section id="profile" class="content-section" aria-label="User profile" hidden>
+        <h2 class="section-title">Profile</h2>
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <img id="profileImage" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User avatar" style="border-radius: 50%; width: 80px; height: 80px;" />
+          <div>
+            <h3 id="profileUsername">User#0000</h3>
+            <button id="profileLogoutBtn" class="form-submit" style="max-width: 120px;">Logout</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+  (() => {
+    // Navigation and content section elements
+    const navButtons = [...document.querySelectorAll('aside.sidebar nav button.nav-btn')];
+    const sections = [...document.querySelectorAll('main#content section.content-section')];
+    const logArea = document.getElementById('logArea');
+
+    // Dashboard overview elements
+    const botStatusEl = document.getElementById('botStatus');
+    const serverCountEl = document.getElementById('serverCount');
+    const userCountEl = document.getElementById('userCount');
+
+    // Commands section elements
+    const commandsTableBody = document.getElementById('commandsTableBody');
+
+    // Settings section elements
+    const settingsForm = document.getElementById('settingsForm');
+    const presenceInput = document.getElementById('presenceInput');
+    const welcomeMessageInput = document.getElementById('welcomeMessageInput');
+    const settingsStatus = document.getElementById('settingsStatus');
+
+    // Profile section elements
+    const profileImage = document.getElementById('profileImage');
+    const profileUsername = document.getElementById('profileUsername');
+    const profileLogoutBtn = document.getElementById('profileLogoutBtn');
+
+    // Topbar elements
+    const topProfileAvatar = document.getElementById('profileAvatar');
+    const topProfileName = document.getElementById('profileName');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+    let currentSection = 'dashboard';
+    let isDarkTheme = true;
+    const botInviteLink = 'https://discord.com/oauth2/authorize?client_id=1373687706894204948';
+
+    // Sample commands list
+    const commandsList = [
+      {cmd: 'help', desc: 'Shows help commands', enabled: true},
+      {cmd: 'ping', desc: 'Check bot latency', enabled: true},
+      {cmd: 'kick', desc: 'Kick a user', enabled: false},
+      {cmd: 'ban', desc: 'Ban a user', enabled: false},
+      {cmd: 'stats', desc: 'Show server stats', enabled: true}
+    ];
+
+    // User info (simulated)
+    const user = {
+      username: 'User#1234',
+      avatarURL: 'https://cdn.discordapp.com/avatars/123456789012345678/abcdef1234567890abcdef1234567890.png?size=128'
+    };
+
+    // Bot Status data (simulate fetch)
+    function simulateBotStatusUpdate() {
+      botStatusEl.textContent = 'Online';
+      botStatusEl.classList.add('online');
+      botStatusEl.classList.remove('offline');
+      serverCountEl.textContent = 'Counting';
+      userCountEl.textContent = 'Counting';
+
+      logArea.textContent += `[${new Date().toLocaleTimeString()}] Bot status updated.\n`;
+    }
+
+    // Navigation button click handler
+    function handleNavClick(e) {
+      const target = e.currentTarget;
+      const sectionId = target.getAttribute('data-section');
+      if (sectionId === currentSection) return;
+
+      navButtons.forEach(btn => {
+        btn.classList.toggle('active', btn === target);
+        btn.setAttribute('aria-current', btn === target ? 'page' : 'false');
+      });
+      sections.forEach(section => {
+        section.hidden = section.id !== sectionId;
+      });
+      currentSection = sectionId;
+      // For accessibility
+      document.getElementById(sectionId).focus();
+
+      // Animate section cards on show
+      animateCardsInSection(sectionId);
+    }
+
+    navButtons.forEach(btn => btn.addEventListener('click', handleNavClick));
+
+    // Animate cards in a section with fade-up
+    function animateCardsInSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      const cards = [...section.querySelectorAll('.card-small, form, table, #logArea')];
+      cards.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(40px)';
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, 150 * index);
+      });
+    }
+
+    // Populate commands table
+    function populateCommandsTable() {
+      commandsTableBody.innerHTML = '';
+      commandsList.forEach(({cmd, desc, enabled}, idx) => {
+        const tr = document.createElement('tr');
+        const tdCmd = document.createElement('td');
+        tdCmd.textContent = cmd;
+        const tdDesc = document.createElement('td');
+        tdDesc.textContent = desc;
+        const tdEnabled = document.createElement('td');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = enabled;
+        checkbox.disabled = true; // Disabled to reflect fixed command prefix and settings
+        tdEnabled.appendChild(checkbox);
+        tr.appendChild(tdCmd);
+        tr.appendChild(tdDesc);
+        tr.appendChild(tdEnabled);
+        commandsTableBody.appendChild(tr);
+      });
+    }
+
+    // Settings form submission
+    settingsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const presence = presenceInput.value.trim();
+      const welcomeMessage = welcomeMessageInput.value.trim();
+      if (!presence) {
+        alert('Please enter a bot status message.');
+        return;
+      }
+      logArea.textContent += `[${new Date().toLocaleTimeString()}] Settings updated: presence="${presence}", welcome message set.\n`;
+      settingsStatus.textContent = 'Settings saved successfully.';
+      setTimeout(() => { settingsStatus.textContent = ''; }, 4000);
+    });
+
+    // Logout handler: redirect to given site
+    logoutBtn.addEventListener('click', () => {
+      window.location.href = 'https://allinonebotwebsite.netlify.app/';
+    });
+    profileLogoutBtn.addEventListener('click', () => logoutBtn.click());
+
+    // Theme toggle
+    themeToggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light-theme');
+      const darkMode = !document.body.classList.contains('light-theme');
+      themeToggleBtn.textContent = darkMode ? 'Dark Mode' : 'Light Mode';
+    });
+
+    // Initialize profile info
+    function initProfile() {
+      profileUsername.textContent = user.username;
+      profileImage.src = user.avatarURL;
+      topProfileName.textContent = user.username;
+      topProfileAvatar.src = user.avatarURL;
+    }
+
+    // Initialize all UI and data
+    function init() {
+      populateCommandsTable();
+      simulateBotStatusUpdate();
+      initProfile();
+      animateCardsInSection('dashboard'); // animate the first view
+    }
+
+    init();
+  })();
+</script>
+</body>
+</html>
+
